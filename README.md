@@ -29,7 +29,22 @@ Se encuentra conformada por las siguientes features:
   * *class*: Variable dicotómica que toma los valores 'debe' y 'haber'. Originalmente asociada a 'CARGO' y 'DATA'. Ver [glosario](https://realhacienda.colmex.mx/index.php/glosario)
   * *region_1*: Variable categórica que identifica a qué región general corresponde la observación
   * *region_2*: Variable categórica que identifica a qué región específica corresponde la observación
-  
+
+
+
+# :open_file_folder:[scripts](https://github.com/nelson-io/cajas-real-hacienda/tree/master/scripts)
+Contenedor de todo el código del proyecto. Se encuentra dividido en 2 archivos:
+* **import_data.R**: Genera directorios temporales, descargando todos los zips disponibles en el [sitio web](https://realhacienda.colmex.mx/) y descomprimiéndolos de manera ordenada dentro de la carpeta [data](https://github.com/nelson-io/cajas-real-hacienda/tree/master/data).
+* **clean_data.R**: Define múltiples funciones y permite iterar por cada uno de los documentos crudos, deconstruyendo el formato y reorganizándolos en un formato tabular amigable, lidia con asignaciones de fechas a través de imputaciones e identificación de patrones de construcción con *regex*.
+
+
+# Próximos pasos:
+* Sumar regiones generales que por heterogeneidad de formatos no han sido incluídas
+   * data/nueva_espana 
+* Sumar regiones específicas que por heterogeneidad de formatos no han sido incluídas
+   * data/rio_de_la_plata/SAN JUAN.xls 
+* Optimizar algoritmo de identificación de fechas para mejorar precisión de *end_date*
+* Sumar información de 'Ensayados' en el deber y haber dentro de los datos a través de nuevos niveles en la variable *class* 
 
 
 
