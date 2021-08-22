@@ -36,7 +36,7 @@ Se encuentra conformada por las siguientes features:
 Contenedor de todo el código del proyecto. Se encuentra dividido en 2 archivos:
 * **import_data.R**: Genera directorios temporales, descargando todos los zips disponibles en el [sitio web](https://realhacienda.colmex.mx/) y descomprimiéndolos de manera ordenada dentro de la carpeta [data](https://github.com/nelson-io/cajas-real-hacienda/tree/master/data).
 * **clean_data.R**: Define múltiples funciones y permite iterar por cada uno de los documentos crudos, deconstruyendo el formato y reorganizándolos en un formato tabular amigable, lidia con asignaciones de fechas a través de imputaciones e identificación de patrones de construcción con *regex*.
-
+* **clean_nueva_esp.R**: implementación del script anterior ajustado a los datos particulates de Nueva España.
 
 
 
