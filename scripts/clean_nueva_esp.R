@@ -23,26 +23,8 @@ select_not_null <- function(df){
   return(clean_df)
 }
 
-#homogeneizamos nombres
-homog_names <- function(df){
-  if(!('ensayados' %in% names(df))){
-    df$ensayados <- NA
-    df$ensayados_1 <- NA
-  }
-  
-  else  {
-    ensayados_vars <- names(df)[str_detect(names(df), 'ensayado')]
-    df$ensayados <- df %>% pull(ensayados_vars[1])
-    df$ensayados_1 <- df %>% pull(ensayados_vars[2])
-    
-  } 
-  
-  return(df %>% select(c("cargo", "ocho", "ensayados", "data", "ocho_1", "ensayados_1")))
-}
-
 #parseamos fechas
 add_cajas_date <- function(df){
-  
   
   pattern <- regex('\\d{1}(/|-|//)\\d{4}')
   
@@ -60,7 +42,7 @@ add_cajas_date <- function(df){
                                          dmy(paste0('1/1/',str_extract(df[,1], pattern)))), na.rm = F)
     df$end_date <- na.locf(case_when(df$date_binary == T ~ 
                                        dmy(paste0('31/12/',str_extract(df[,1], pattern)))), na.rm = F)
-    return(df %>% select(start_date, end_date, debe = cargo, ocho, ensayados, haber = data, ocho_1, ensayados_1))
+    return(df %>% select(start_date, end_date, debe = cargo, ocho = na, haber = data, ocho_1 = na_1))
   }
   
   df$date_binary <- filt
@@ -71,44 +53,30 @@ add_cajas_date <- function(df){
   
   df$date_binary <- NULL
   
-  
-  
-  
-  
-  return(df %>% select(start_date, end_date, debe = cargo, ocho, ensayados, haber = data, ocho_1, ensayados_1))
-  
+  if('ocho' %in% names(df)){
+    return(df %>% select(start_date, end_date, debe = cargo, ocho , haber = data, ocho_1 ))
+  }
+  else{
+  return(df %>% select(start_date, end_date, debe = cargo, ocho = na, haber = data, ocho_1 = na_1))
+  }
   
 }
 
-
-
-
+#pivoteamos datos
 pivot_bind <- function(df){
   df1 <- df %>% 
     select(start_date, end_date, concepto = debe, valor = ocho) %>% 
-    mutate(clase = 'debe', u_mon = 'ocho')
+    mutate(clase = 'debe')
   
   df2 <- df %>% 
     select(start_date, end_date, concepto = haber, valor = ocho_1) %>% 
-    mutate(clase = 'haber', u_mon = 'ocho')
+    mutate(clase = 'haber')
   
-  df3 <- df %>% 
-    select(start_date, end_date, concepto = haber, valor = ensayados) %>% 
-    mutate(clase = 'haber', u_mon = 'ensayados')
-  
-  df4 <- df %>% 
-    select(start_date, end_date, concepto = haber, valor = ensayados_1) %>% 
-    mutate(clase = 'debe', u_mon = 'ensayados')
-  
-  bind_df <- rbind(df1,df2, df3, df4) %>% 
+  bind_df <- rbind(df1,df2) %>% 
     filter(!is.na(valor))
   
   return(bind_df)
 }
-
-
-
-
 
 #removemos totales
 remove_totals <- function(df){
@@ -117,7 +85,7 @@ remove_totals <- function(df){
 }
 
 #importamos los datos
-import_rh <- function(path, st_row = 4){
+import_rh <- function(path, st_row = 2){
   
   print(path)
   
@@ -127,11 +95,11 @@ import_rh <- function(path, st_row = 4){
   df <- read.xlsx(path,1,startRow = st_row) %>% 
     select_not_null() %>%
     filter(rowSums(is.na(.)) < ncol(.)) %>% 
-    homog_names() %>% 
     add_cajas_date() %>% 
     pivot_bind() %>%  
     remove_totals() %>% 
     mutate(valor = as.numeric(valor),
+           u_mon = 'ocho',
            region_1 = folder,
            region_2 = name)
   
@@ -140,15 +108,13 @@ import_rh <- function(path, st_row = 4){
 }
 
 dfs <- list()
-dfs$alto_peru_df <- map_df(list.files('data/alto_peru', full.names = T), import_rh)
-dfs$chile_df <- map_df(list.files('data/chile', full.names = T), import_rh)
-dfs$ecuador_df <- map_df(list.files('data/ecuador', full.names = T), import_rh)
-dfs$peru_df <- map_df(list.files('data/peru', full.names = T), import_rh)
-# nuevesp_df <- map_df(list.files('data/nueva_espana', full.names = T), import_rh)
-dfs$rdp_df <- map_df(setdiff(list.files('data/rio_de_la_plata',full.names = T),
-                         "data/rio_de_la_plata/SAN JUAN.xls"), import_rh)
+nuevesp_df <- map_df(list.files('data/nueva_espana', full.names = T), import_rh)
+
 
 #bindeamos
 
-cajas_df <- do.call('rbind', dfs)
+cajas_df <- rbind(cajas_df, nuevesp_df)
 write_csv(cajas_df,'out/cajas_df.csv')
+
+
+
