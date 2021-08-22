@@ -38,13 +38,6 @@ Contenedor de todo el código del proyecto. Se encuentra dividido en 2 archivos:
 * **clean_data.R**: Define múltiples funciones y permite iterar por cada uno de los documentos crudos, deconstruyendo el formato y reorganizándolos en un formato tabular amigable, lidia con asignaciones de fechas a través de imputaciones e identificación de patrones de construcción con *regex*.
 
 
-# Próximos pasos:
-* Sumar regiones generales que por heterogeneidad de formatos no han sido incluídas
-   * data/nueva_espana 
-* Sumar regiones específicas que por heterogeneidad de formatos no han sido incluídas
-   * data/rio_de_la_plata/SAN JUAN.xls 
-* Optimizar algoritmo de identificación de fechas para mejorar precisión de *end_date*
-* Sumar información de 'Ensayados' en el deber y haber dentro de los datos a través de nuevos niveles en la variable *class* 
 
 
 
